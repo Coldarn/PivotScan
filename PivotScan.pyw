@@ -35,12 +35,21 @@ class ImagePanel(wx.Window):
         wx.Window.__init__(self, parent)
         self.SetBackgroundColour(wx.Colour(255, 255, 255))
 
+        self.pendingRepaint = False
         self.imagePanel = None
         self.paperPicker = None
 
+        self.Parent.Bind(wx.EVT_IDLE, self.OnIdle)
+
     def OnResize(self, evt):
         if self.imagePanel:
+            self.pendingRepaint = True
+
+    def OnIdle(self, evt):
+        if self.pendingRepaint:
+            self.Parent.Layout()
             self.RefreshBitmap()
+            self.pendingRepaint = False
 
     def RefreshBitmap(self):
         oldSize = self.image.GetSize()
@@ -49,10 +58,10 @@ class ImagePanel(wx.Window):
         newSize = (oldSize[0] * scale, oldSize[1] * scale)
 
         bitmap = self.image.Scale(newSize[0], newSize[1], wx.IMAGE_QUALITY_HIGH).ConvertToBitmap();
-        imgControl = wx.StaticBitmap(self, bitmap=bitmap)
+        self.imagePanel.DestroyChildren()
+        imgControl = wx.StaticBitmap(self.imagePanel, bitmap=bitmap)
         imgControl.SetPosition((windowSize[0] / 2 - newSize[0] / 2 + 20, windowSize[1] / 2 - newSize[1] / 2 + 20))
         self.Parent.Layout()
-        self.Parent.Refresh()
 
     def SetImage(self, imgPath):
         if not self.imagePanel:
@@ -90,7 +99,7 @@ class ImagePanel(wx.Window):
             imgPanelSizer.Add(controlsPanel, 0, flag=wx.EXPAND)
             self.SetSizer(imgPanelSizer)
             self.Parent.Layout()
-            self.Parent.Bind(wx.EVT_SIZE, self.OnResize, self.Parent)
+            self.Parent.Bind(wx.EVT_SIZE, self.OnResize)
 
         self.paperPicker.Value = 'Letter'
 
@@ -117,13 +126,11 @@ def OnScan(evt):
         imagePanel.SetImage(path)
 
 app = wx.App()
-frame = wx.Frame(None, wx.ID_ANY, 'PivotScan', style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
+frame = wx.Frame(None, wx.ID_ANY, 'PivotScan')
 frame.SetClientSize(WINDOW_SIZE)
 frame.SetMinClientSize(WINDOW_SIZE)
-#frame.SetMaxClientSize(WINDOW_SIZE)
 
-topPanel = wx.Window(frame)#, size=(WINDOW_SIZE[0], 50))
-#topPanel.SetBackgroundColour(wx.Colour(255, 255, 255))
+topPanel = wx.Window(frame)
 topRow = wx.BoxSizer()
 topRow.AddSpacer((10, 50))
 topRow.Add(wx.StaticText(topPanel, label='Scanner'), flag=wx.ALIGN_CENTER)

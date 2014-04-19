@@ -15,10 +15,11 @@ from reportlab.lib.units import inch
 
 os.chdir(os.path.dirname(sys.argv[0]))
 
-SKIP_SCAN = False
+SKIP_SCAN = True
 SAVE_DIR = os.path.join(os.environ['APPDATA'], 'PivotScan')
 
-WINDOW_SIZE = (700, 800)
+WINDOW_SIZE = (600, 600)
+PADDING = 8
 IMAGE_SIZE = WINDOW_SIZE[0] - 40
 SCAN_DPI = 300.
 PAPER_SIZES = (
@@ -152,23 +153,29 @@ class ImagePanel(wx.Window):
 
             controlsSizer = wx.BoxSizer()
             
-            controlsSizer.AddSpacer((10, 50))
+            controlsSizer.AddSpacer((PADDING, 50))
             controlsSizer.Add(wx.StaticText(controlsPanel, label='Paper Size'), flag=wx.ALIGN_CENTER)
-            controlsSizer.AddSpacer(10)
+            controlsSizer.AddSpacer(PADDING)
 
             self.paperPicker = wx.ComboBox(controlsPanel, style=wx.CB_DROPDOWN | wx.CB_READONLY, choices=[n[0] for n in PAPER_SIZES])
             self.paperPicker.Value = GetSetting(paperSize=PAPER_SIZES[0][0])
             self.paperPicker.Bind(wx.EVT_COMBOBOX, self.SetPaperSize)
             controlsSizer.Add(self.paperPicker, flag=wx.ALIGN_CENTER)
-            controlsSizer.AddSpacer(10)
+            controlsSizer.AddStretchSpacer()
 
-            rotateLeftButton = wx.Button(controlsPanel)
+            rotateLeftButton = wx.Button(controlsPanel, size=(42, 36))
             rotateLeftButton.SetBitmap(wx.Bitmap('RotateLeft.png'))
             self.Bind(wx.EVT_BUTTON, lambda _: self.Rotate(False), rotateLeftButton)
             controlsSizer.Add(rotateLeftButton, flag=wx.ALIGN_CENTER)
-            controlsSizer.AddSpacer(10)
+            controlsSizer.AddSpacer(PADDING)
 
-            rotateRightButton = wx.Button(controlsPanel)
+            centerButton = wx.Button(controlsPanel, size=(42, 36))
+            centerButton.SetBitmap(wx.Bitmap('Center.png'))
+            self.Bind(wx.EVT_BUTTON, self.Center, centerButton)
+            controlsSizer.Add(centerButton, flag=wx.ALIGN_CENTER)
+            controlsSizer.AddSpacer(PADDING)
+
+            rotateRightButton = wx.Button(controlsPanel, size=(42, 36))
             rotateRightButton.SetBitmap(wx.Bitmap('RotateRight.png'))
             rotateRightButton.Bind(wx.EVT_BUTTON, lambda _: self.Rotate(True))
             controlsSizer.Add(rotateRightButton, flag=wx.ALIGN_CENTER)
@@ -177,12 +184,12 @@ class ImagePanel(wx.Window):
             self.openAfterSaveCheckbox = wx.CheckBox(controlsPanel, label='Open after save')
             self.openAfterSaveCheckbox.Value = GetSetting(openAfterSave=True)
             controlsSizer.Add(self.openAfterSaveCheckbox, flag=wx.ALIGN_CENTER)
-            controlsSizer.AddSpacer(10)
+            controlsSizer.AddSpacer(PADDING)
 
-            saveToPdfButton = wx.Button(controlsPanel, label='Save to PDF')
+            saveToPdfButton = wx.Button(controlsPanel, label='Save to PDF', size=(-1, 36))
             saveToPdfButton.Bind(wx.EVT_BUTTON, lambda _: self.SaveToPDF())
             controlsSizer.Add(saveToPdfButton, flag=wx.ALIGN_CENTER)
-            controlsSizer.AddSpacer(10)
+            controlsSizer.AddSpacer(PADDING)
 
             controlsPanel.SetSizer(controlsSizer)
 
@@ -212,6 +219,10 @@ class ImagePanel(wx.Window):
 
     def Rotate(self, clockwise):
         self.image = self.image.Rotate90(clockwise)
+        self.RefreshBitmap()
+
+    def Center(self, evt):
+        self.imageOffset = wx.Point2D()
         self.RefreshBitmap()
 
     def SaveToPDF(self):
@@ -258,13 +269,14 @@ app = wx.App()
 frame = wx.Frame(None, wx.ID_ANY, 'PivotScan')
 frame.SetClientSize(WINDOW_SIZE)
 frame.SetMinClientSize(WINDOW_SIZE)
+frame.SetIcon(wx.Icon('PivotScan.ico', wx.BITMAP_TYPE_ICO))
 
 # Build up the top UI panel
 topPanel = wx.Window(frame)
 topRow = wx.BoxSizer()
-topRow.AddSpacer((10, 50))
+topRow.AddSpacer((PADDING, 50))
 topRow.Add(wx.StaticText(topPanel, label='Scanner'), flag=wx.ALIGN_CENTER)
-topRow.AddSpacer(10)
+topRow.AddSpacer(PADDING)
 
 # Dropdown to choose which scanner to use
 scannerPicker = wx.ComboBox(topPanel, style=wx.CB_DROPDOWN | wx.CB_READONLY, choices=scannerNames)
@@ -274,10 +286,10 @@ topRow.Add(scannerPicker, flag=wx.ALIGN_CENTER)
 topRow.AddStretchSpacer()
 
 # Button that kicks off a scan and population of the image panel UI
-scanButton = wx.Button(topPanel, label='Scan')
+scanButton = wx.Button(topPanel, label='Scan', size=(-1, 36))
 frame.Bind(wx.EVT_BUTTON, OnScan, scanButton)
 topRow.Add(scanButton, flag=wx.ALIGN_CENTER)
-topRow.AddSpacer(10)
+topRow.AddSpacer(PADDING)
 
 topPanel.SetSizer(topRow)
 

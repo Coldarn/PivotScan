@@ -17,7 +17,13 @@ packages = [
 
 setup(
     windows=['PivotScan.pyw'],
-    data_files=['RotateLeft.png', 'RotateRight.png', 'msvcp90.dll'],
+    data_files=[
+        'PivotScan.ico',
+        'RotateLeft.png',
+        'Center.png',
+        'RotateRight.png',
+        'msvcp90.dll'
+    ],
     options={
         'py2exe': { 'packages': packages },
     })

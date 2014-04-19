@@ -266,39 +266,44 @@ def OnScan(evt):
         imagePanel.SetImage(path)
 
 app = wx.App()
-frame = wx.Frame(None, wx.ID_ANY, 'PivotScan')
-frame.SetClientSize(WINDOW_SIZE)
-frame.SetMinClientSize(WINDOW_SIZE)
-frame.SetIcon(wx.Icon('PivotScan.ico', wx.BITMAP_TYPE_ICO))
 
-# Build up the top UI panel
-topPanel = wx.Window(frame)
-topRow = wx.BoxSizer()
-topRow.AddSpacer((PADDING, 50))
-topRow.Add(wx.StaticText(topPanel, label='Scanner'), flag=wx.ALIGN_CENTER)
-topRow.AddSpacer(PADDING)
+if not SKIP_SCAN and len(scanners) < 1:
+    wx.MessageBox('ERROR: No scanners detected!', 'PivotScan', style=wx.OK | wx.CENTER | wx.ICON_ERROR)
+else:
+    frame = wx.Frame(None, wx.ID_ANY, 'PivotScan')
+    frame.SetClientSize(WINDOW_SIZE)
+    frame.SetMinClientSize(WINDOW_SIZE)
+    frame.SetIcon(wx.Icon('PivotScan.ico', wx.BITMAP_TYPE_ICO))
 
-# Dropdown to choose which scanner to use
-scannerPicker = wx.ComboBox(topPanel, style=wx.CB_DROPDOWN | wx.CB_READONLY, choices=scannerNames)
-scannerPicker.Value = GetSetting(scanner=scannerNames[0])
-scannerPicker.Bind(wx.EVT_COMBOBOX, lambda _: SetSetting(scanner=scannerPicker.Value))
-topRow.Add(scannerPicker, flag=wx.ALIGN_CENTER)
-topRow.AddStretchSpacer()
+    # Build up the top UI panel
+    topPanel = wx.Window(frame)
+    topRow = wx.BoxSizer()
+    topRow.AddSpacer((PADDING, 50))
+    topRow.Add(wx.StaticText(topPanel, label='Scanner'), flag=wx.ALIGN_CENTER)
+    topRow.AddSpacer(PADDING)
 
-# Button that kicks off a scan and population of the image panel UI
-scanButton = wx.Button(topPanel, label='Scan', size=(-1, 36))
-frame.Bind(wx.EVT_BUTTON, OnScan, scanButton)
-topRow.Add(scanButton, flag=wx.ALIGN_CENTER)
-topRow.AddSpacer(PADDING)
+    # Dropdown to choose which scanner to use
+    scannerPicker = wx.ComboBox(topPanel, style=wx.CB_DROPDOWN | wx.CB_READONLY, choices=scannerNames)
+    scannerPicker.Value = GetSetting(scanner=scannerNames[0])
+    scannerPicker.Bind(wx.EVT_COMBOBOX, lambda _: SetSetting(scanner=scannerPicker.Value))
+    topRow.Add(scannerPicker, flag=wx.ALIGN_CENTER)
+    topRow.AddStretchSpacer()
 
-topPanel.SetSizer(topRow)
+    # Button that kicks off a scan and population of the image panel UI
+    scanButton = wx.Button(topPanel, label='Scan', size=(-1, 36))
+    frame.Bind(wx.EVT_BUTTON, OnScan, scanButton)
+    topRow.Add(scanButton, flag=wx.ALIGN_CENTER)
+    topRow.AddSpacer(PADDING)
 
-contentSizer = wx.BoxSizer(orient=wx.VERTICAL)
-contentSizer.Add(topPanel, flag=wx.EXPAND)
+    topPanel.SetSizer(topRow)
 
-imagePanel = ImagePanel(frame)
-contentSizer.Add(imagePanel, 1, flag=wx.EXPAND)
+    contentSizer = wx.BoxSizer(orient=wx.VERTICAL)
+    contentSizer.Add(topPanel, flag=wx.EXPAND)
 
-frame.SetSizer(contentSizer)
-frame.Show(True)
+    imagePanel = ImagePanel(frame)
+    contentSizer.Add(imagePanel, 1, flag=wx.EXPAND)
+
+    frame.SetSizer(contentSizer)
+    frame.Show(True)
+
 app.MainLoop()

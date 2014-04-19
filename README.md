@@ -11,4 +11,4 @@ PivotScan is a minimal desktop app for collecting images from scanners, pivoting
 
 
 ### Implementation Details
-Due to availiability of usable cross-platform libraries for scanning and PDF authoring, PivotScan is implemented in Python. It uses [imagescanner](https://code.google.com/p/imagescanner/) for image capture from scanners, which itself relies on several other platform-specific libraries for communications. UI is implemented in [wxPython](http://wxpython.org/) for its simplicity and portability, and PDF generation is implemented in the solid [reportlab](https://pypi.python.org/pypi/reportlab).
+Due to availiability of usable cross-platform libraries for scanning and PDF authoring, PivotScan is implemented in Python. It uses [ImageScanner](https://github.com/Coldarn/ImageScanner) for image capture from scanners, which itself relies on TWAIN on Windows and SANE on Linux, both available via easy_install/pip. UI is implemented in [wxPython](http://wxpython.org/) for its simplicity and portability, and PDF generation is implemented in the solid [reportlab](https://pypi.python.org/pypi/reportlab).

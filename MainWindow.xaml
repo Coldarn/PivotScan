@@ -16,7 +16,7 @@
             <RowDefinition Height="auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Padding="5" Background="LightGray" BorderThickness="0 0 0 1" BorderBrush="#FF7D7D7D">
+        <Border Grid.Row="0" Padding="5" Background="LightGray" BorderThickness="0 0 0 1" BorderBrush="#FF7D7D7D" Panel.ZIndex="2">
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="auto" />
@@ -32,7 +32,7 @@
             </Grid>
         </Border>
 
-        <Border  Grid.Row="1" Padding="35" Cursor="SizeAll">
+        <Border Grid.Row="1" Padding="35" Cursor="SizeAll" MouseDown="Page_MouseDown" MouseUp="Page_MouseUp" MouseMove="Page_MouseMove">
             <Canvas Name="Canvas" Margin="0">
                 <Rectangle Name="PageBackground" Fill="White" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100" />
                 <Image Name="ScannedImage" />
@@ -66,7 +66,7 @@
                 <Button Grid.Column="5" Padding="3" Margin="3 0 0 0" Click="RotateRight_Click">
                     <Image Source="images/RotateRight.png" Width="24" />
                 </Button>
-                <CheckBox Grid.Column="7" Content="Open afer save" VerticalAlignment="Center" Checked="AutoOpen_Checked"/>
+                <CheckBox Grid.Column="7" Content="Open afer save" VerticalAlignment="Center" IsChecked="True" Checked="AutoOpen_Checked"/>
                 <Button Grid.Column="8" Content="Save" Margin="5 0 0 0" Height="26" Click="Save_Click" />
             </Grid>
         </Border>

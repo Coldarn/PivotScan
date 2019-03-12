@@ -78,6 +78,8 @@ namespace PivotScan2
             var imagePath = Path.Combine(Settings.AppDataPath, "image." + image.FileExtension);
             File.Delete(imagePath);
             image.SaveFile(imagePath);
+
+            // Save the image dimentions for scaling computations later
             this.imageSizeInches = new ScannedImageSize
             {
                 Width = image.Width,
@@ -89,8 +91,9 @@ namespace PivotScan2
             // Center the newly-scanned image
             this.imageOffsetInches = new Point();
 
+            // Draw the new image
             this.ScannedImage.Source = new ImageSourceConverter().ConvertFromString(imagePath) as ImageSource;
-            this.UpdateCanvas();
+            this.UpdateScannedImageBounds();
         }
 
         private void PickPaperSize_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -100,11 +103,6 @@ namespace PivotScan2
             this.UpdateCanvas();
             Settings.Instance.PaperSize = paperSize.Name;
             Settings.Instance.Save();
-        }
-
-        private void AutoOpen_Checked(object sender, RoutedEventArgs e)
-        {
-
         }
 
         private void RotateLeft_Click(object sender, RoutedEventArgs e)

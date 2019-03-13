@@ -6,6 +6,10 @@ using System.Windows.Controls;
 using WIA;
 using System.IO;
 using System.Windows.Media;
+using PdfSharp.Pdf;
+using PdfSharp.Drawing;
+using System.Windows.Media.Imaging;
+using System.Diagnostics;
 
 namespace PivotScan2
 {
@@ -18,7 +22,7 @@ namespace PivotScan2
 
         private Scanner scanner;
         private PaperSize pageSizeInches;
-        private ScannedImageSize imageSizeInches;
+        private ScannedImageSize imageSizePixels;
         private Point imageOffsetInches = new Point();
 
         // Local state for dragging the scanned image, only valid while dragging
@@ -70,17 +74,20 @@ namespace PivotScan2
 
         private void Scan_Click(object sender, RoutedEventArgs e)
         {
-            if (this.scanner == null)
-                return;
+            if (this.scanner == null) return; // No scanner selected/available
+
             Device device = this.scanner.Device.Connect();
             ICommonDialog wiaCommonDialog = new WIA.CommonDialog();
             ImageFile image = (ImageFile)wiaCommonDialog.ShowTransfer(device.Items[1], WiaFormatPNG);
+
+            if (image == null) return; // Scan cancelled
+
             var imagePath = Path.Combine(Settings.AppDataPath, "image." + image.FileExtension);
             File.Delete(imagePath);
             image.SaveFile(imagePath);
 
             // Save the image dimentions for scaling computations later
-            this.imageSizeInches = new ScannedImageSize
+            this.imageSizePixels = new ScannedImageSize
             {
                 Width = image.Width,
                 Height = image.Height,
@@ -92,7 +99,7 @@ namespace PivotScan2
             this.imageOffsetInches = new Point();
 
             // Draw the new image
-            this.ScannedImage.Source = new ImageSourceConverter().ConvertFromString(imagePath) as ImageSource;
+            this.ScannedImage.Source = new ImageSourceConverter().ConvertFromString(imagePath) as BitmapSource;
             this.UpdateScannedImageBounds();
         }
 
@@ -123,7 +130,48 @@ namespace PivotScan2
 
         private void Save_Click(object sender, RoutedEventArgs e)
         {
+            if (this.imageSizePixels == null) return;
 
+            var dialog = new Microsoft.Win32.SaveFileDialog();
+            dialog.DefaultExt = ".pdf";
+            dialog.Filter = "PDF documents (.pdf)|*.pdf";
+
+            if (dialog.ShowDialog() != true) return;
+
+            var pdf = new PdfDocument();
+            var page = pdf.AddPage();
+            page.Size = this.pageSizeInches.PdfSize;
+            page.Orientation = this.pageSizeInches.Orientation;
+
+            var gfx = XGraphics.FromPdfPage(page);
+
+            var encoder = new PngBitmapEncoder();
+            encoder.Frames.Add(BitmapFrame.Create(this.ScannedImage.Source as BitmapSource));
+            using (var ms = new MemoryStream())
+            {
+                encoder.Save(ms);
+                var image = XImage.FromStream(ms);
+
+                XUnit width = XUnit.FromInch(this.imageSizePixels.Width / this.imageSizePixels.HorizontalResolution);
+                XUnit height= XUnit.FromInch(this.imageSizePixels.Height / this.imageSizePixels.VerticalResolution);
+                XUnit x = -width / 2 + page.Width / 2 + XUnit.FromInch(this.imageOffsetInches.X);
+                XUnit y = -height / 2 + page.Height/ 2 + XUnit.FromInch(this.imageOffsetInches.Y);
+                gfx.DrawImage(image, x, y, width, height);
+            }
+
+            try
+            {
+                pdf.Save(dialog.FileName);
+
+                if (this.OpenAfterSave.IsChecked == true)
+                {
+                    Process.Start(dialog.FileName);
+                }
+            }
+            catch (IOException)
+            {
+                MessageBox.Show("Cannot save as the given file is open - please close it and try again.");
+            }
         }
 
         private void Window_SizeChanged(object sender, SizeChangedEventArgs e)
@@ -165,11 +213,11 @@ namespace PivotScan2
         private void UpdateScannedImageBounds()
         {
             // Only continue if we have a scanned image
-            if (this.imageSizeInches == null) return;
+            if (this.imageSizePixels == null) return;
 
             // Scale the scanned image to the page
-            this.ScannedImage.Width = this.imageSizeInches.Width / this.imageSizeInches.HorizontalResolution / this.pageSizeInches.Width * this.PageBackground.Width;
-            this.ScannedImage.Height = this.imageSizeInches.Height / this.imageSizeInches.VerticalResolution / this.pageSizeInches.Height * this.PageBackground.Height;
+            this.ScannedImage.Width = this.imageSizePixels.Width / this.imageSizePixels.HorizontalResolution / this.pageSizeInches.Width * this.PageBackground.Width;
+            this.ScannedImage.Height = this.imageSizePixels.Height / this.imageSizePixels.VerticalResolution / this.pageSizeInches.Height * this.PageBackground.Height;
 
             // Center it on the page, adjusting for the drag offset
             Canvas.SetLeft(this.ScannedImage, -this.ScannedImage.Width / 2 + this.Canvas.ActualWidth / 2 + this.imageOffsetInches.X * PagePixelsPerInchX);

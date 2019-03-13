@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:PivotScan2"
         mc:Ignorable="d"
         WindowStartupLocation="CenterScreen"
-        Icon="images/PivotScan.ico"
+        Icon="PivotScan.ico"
         SizeChanged="Window_SizeChanged"
         Title="Pivot Scan v2" Height="800" Width="800" MinWidth="600" MinHeight="600">
     <Grid Background="AntiqueWhite">
@@ -66,7 +66,7 @@
                 <Button Grid.Column="5" Padding="3" Margin="3 0 0 0" Click="RotateRight_Click">
                     <Image Source="images/RotateRight.png" Width="24" />
                 </Button>
-                <CheckBox Grid.Column="7" Content="Open afer save" VerticalAlignment="Center" IsChecked="True"/>
+                <CheckBox Name="OpenAfterSave" Grid.Column="7" Content="Open afer save" VerticalAlignment="Center" IsChecked="True"/>
                 <Button Grid.Column="8" Content="Save" Margin="5 0 0 0" Height="26" Click="Save_Click" />
             </Grid>
         </Border>

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using PdfSharp;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -18,27 +19,22 @@ namespace PivotScan2
     {
         public static readonly PaperSize[] Defaults = new[]
         {
-            new PaperSize("Letter (Portrait)", 8.5f, 11f),
-            new PaperSize("Letter (Landscape)", 11f, 8.5f),
-            new PaperSize("Legal (Portrait)", 8.5f, 14f),
-            new PaperSize("Legal (Landscape)", 14f, 8.5f),
-            new PaperSize("Ledger (Portrait)", 11f, 17f),
-            new PaperSize("Ledger (Landscape)", 17f, 11f),
+            new PaperSize { Name = "Letter (Portrait)", Width = 8.5f, Height = 11f, PdfSize = PageSize.Letter, Orientation = PageOrientation.Portrait },
+            new PaperSize { Name = "Letter (Landscape)", Width = 11f, Height = 8.5f, PdfSize = PageSize.Letter, Orientation = PageOrientation.Landscape },
+            new PaperSize { Name = "Legal (Portrait)", Width = 8.5f, Height = 14f, PdfSize = PageSize.Legal, Orientation = PageOrientation.Portrait },
+            new PaperSize { Name = "Legal (Landscape)", Width = 14f, Height = 8.5f, PdfSize = PageSize.Legal, Orientation = PageOrientation.Landscape },
+            new PaperSize { Name = "Ledger (Portrait)", Width = 11f, Height = 17f, PdfSize = PageSize.Ledger, Orientation = PageOrientation.Landscape },
+            new PaperSize { Name = "Ledger (Landscape)", Width = 17f, Height = 11f, PdfSize = PageSize.Ledger, Orientation = PageOrientation.Portrait },
         };
 
 
         public string Name { get; set; }
         public float Width { get; set; }
         public float Height { get; set; }
+        public PageSize PdfSize { get; set; }
+        public PageOrientation Orientation { get; set; }
 
         public float AspectRatio { get { return this.Width / this.Height; } }
-
-        public PaperSize(string name, float width, float height)
-        {
-            this.Name = name;
-            this.Width = width;
-            this.Height = height;
-        }
     }
 
     internal class ScannedImageSize

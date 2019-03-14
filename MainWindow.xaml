@@ -1,0 +1,74 @@
+﻿<Window x:Class="PivotScan2.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:PivotScan2"
+        mc:Ignorable="d"
+        WindowStartupLocation="CenterScreen"
+        Icon="PivotScan.ico"
+        SizeChanged="Window_SizeChanged"
+        Title="Pivot Scan v2" Height="800" Width="800" MinWidth="600" MinHeight="600">
+    <Grid Background="AntiqueWhite">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="auto" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0" Padding="5" Background="LightGray" BorderThickness="0 0 0 1" BorderBrush="#FF7D7D7D" Panel.ZIndex="2">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="250px" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="100px" />
+                </Grid.ColumnDefinitions>
+
+                <Label Content="Scanner:" Grid.Column="0"/>
+                <ComboBox Name="PickScanner" DisplayMemberPath="Name" Grid.Column="1" VerticalContentAlignment="Center"
+                          SelectionChanged="PickScanner_SelectionChanged" />
+                <Button Content="Scan" Grid.Column="3" Click="Scan_Click" />
+            </Grid>
+        </Border>
+
+        <Border Grid.Row="1" Padding="35" Cursor="SizeAll" MouseDown="Page_MouseDown" MouseUp="Page_MouseUp" MouseMove="Page_MouseMove">
+            <Canvas Name="Canvas" Margin="0">
+                <Rectangle Name="PageBackground" Fill="White" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100" />
+                <Image Name="ScannedImage" RenderTransformOrigin=".5,.5" />
+                <Rectangle Name="PageBorder" Stroke="Black" StrokeThickness="3" StrokeDashArray="4 2" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100"/>
+            </Canvas>
+        </Border>
+
+        <Border Grid.Row="2" Padding="5" Background="LightGray" BorderThickness="0 1 0 0" BorderBrush="#FF7D7D7D">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="auto" />
+                    <ColumnDefinition Width="100px" />
+                </Grid.ColumnDefinitions>
+
+                <Label Content="Paper Size:" Grid.Column="0" VerticalAlignment="Center"/>
+                <ComboBox Name="PickPaperSize" DisplayMemberPath="Name" Grid.Column="1" VerticalContentAlignment="Center"
+                          Height="26" SelectionChanged="PickPaperSize_SelectionChanged" />
+                <Button Grid.Column="3" Padding="3" Margin="0 0 3 0" Click="RotateLeft_Click">
+                    <Image Width="24" Source="images/RotateLeft.png" />
+                </Button>
+                <Button Grid.Column="4" Padding="3" Click="Center_Click">
+                    <Image Source="images/Center.png" Width="24" />
+                </Button>
+                <Button Grid.Column="5" Padding="3" Margin="3 0 0 0" Click="RotateRight_Click">
+                    <Image Source="images/RotateRight.png" Width="24" />
+                </Button>
+                <CheckBox Name="OpenAfterSave" Grid.Column="7" Content="Open afer save" VerticalAlignment="Center" IsChecked="True"/>
+                <Button Grid.Column="8" Content="Save" Margin="5 0 0 0" Height="26" Click="Save_Click" />
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

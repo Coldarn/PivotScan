@@ -24,6 +24,7 @@ namespace PivotScan2
         private PaperSize pageSizeInches;
         private ScannedImageSize imageSizePixels;
         private Point imageOffsetInches = new Point();
+        private int imageRotationSteps = 0;
 
         // Local state for dragging the scanned image, only valid while dragging
         private bool isDragging = false;
@@ -114,7 +115,8 @@ namespace PivotScan2
 
         private void RotateLeft_Click(object sender, RoutedEventArgs e)
         {
-
+            this.imageRotationSteps = (this.imageRotationSteps - 1 + 4) % 4;
+            this.UpdateScannedImageBounds();
         }
 
         private void Center_Click(object sender, RoutedEventArgs e)
@@ -125,7 +127,8 @@ namespace PivotScan2
 
         private void RotateRight_Click(object sender, RoutedEventArgs e)
         {
-
+            this.imageRotationSteps = (this.imageRotationSteps + 1) % 4;
+            this.UpdateScannedImageBounds();
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -155,8 +158,11 @@ namespace PivotScan2
                 XUnit width = XUnit.FromInch(this.imageSizePixels.Width / this.imageSizePixels.HorizontalResolution);
                 XUnit height= XUnit.FromInch(this.imageSizePixels.Height / this.imageSizePixels.VerticalResolution);
                 XUnit x = -width / 2 + page.Width / 2 + XUnit.FromInch(this.imageOffsetInches.X);
-                XUnit y = -height / 2 + page.Height/ 2 + XUnit.FromInch(this.imageOffsetInches.Y);
-                gfx.DrawImage(image, x, y, width, height);
+                XUnit y = -height / 2 + page.Height / 2 + XUnit.FromInch(this.imageOffsetInches.Y);
+
+                gfx.TranslateTransform(x, y);
+                gfx.RotateAtTransform(this.imageRotationSteps * 90, new XPoint(width / 2, height / 2));
+                gfx.DrawImage(image, 0, 0, width, height);
             }
 
             try
@@ -222,6 +228,9 @@ namespace PivotScan2
             // Center it on the page, adjusting for the drag offset
             Canvas.SetLeft(this.ScannedImage, -this.ScannedImage.Width / 2 + this.Canvas.ActualWidth / 2 + this.imageOffsetInches.X * PagePixelsPerInchX);
             Canvas.SetTop(this.ScannedImage, -this.ScannedImage.Height / 2 + this.Canvas.ActualHeight / 2 + this.imageOffsetInches.Y * PagePixelsPerInchY);
+
+            // Finally, rotate it
+            this.ScannedImage.RenderTransform = new RotateTransform(this.imageRotationSteps * 90);
         }
 
         private double PagePixelsPerInchX

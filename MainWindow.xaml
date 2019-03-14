@@ -35,7 +35,7 @@
         <Border Grid.Row="1" Padding="35" Cursor="SizeAll" MouseDown="Page_MouseDown" MouseUp="Page_MouseUp" MouseMove="Page_MouseMove">
             <Canvas Name="Canvas" Margin="0">
                 <Rectangle Name="PageBackground" Fill="White" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100" />
-                <Image Name="ScannedImage" />
+                <Image Name="ScannedImage" RenderTransformOrigin=".5,.5" />
                 <Rectangle Name="PageBorder" Stroke="Black" StrokeThickness="3" StrokeDashArray="4 2" Canvas.Left="0" Canvas.Top="0" Width="100" Height="100"/>
             </Canvas>
         </Border>
